@@ -1,27 +1,31 @@
 # comixone-backend
 
-TODO: Write a description here
+Backend applications for Comixone website
 
-## Installation
+## Requirements
 
-TODO: Write installation instructions here
+1. [Crystal language stack](https://crystal-lang.org/)
 
-## Usage
+2. [Kemal web framework](https://kemalcr.com/)
 
-TODO: Write usage instructions here
+3. [CouchDB database](https://couchdb.apache.org/) main database
 
-## Development
+4. [Dragonfly database](https://dragonflydb.io/) in memory database for fast access, caching, pub/sub
 
-TODO: Write development instructions here
+## Install dependencies
+
+```bash
+shards install
+```
 
 ## Contributing
 
-1. Fork it (<https://github.com/your-github-user/comixone-backend/fork>)
-2. Create your feature branch (`git checkout -b my-new-feature`)
-3. Commit your changes (`git commit -am 'Add some feature'`)
-4. Push to the branch (`git push origin my-new-feature`)
+1. Fork it (<https://github.com/Comixone/comixone-backend/fork>)
+2. Create your feature branch (`git checkout -b feat/something`)
+3. Commit your changes (`git commit -S -am 'Add some feature' --signoff`)
+4. Push to the branch (`git push origin feat/something`)
 5. Create a new Pull Request
 
 ## Contributors
 
-- [Anar K. Jafarov](https://github.com/your-github-user) - creator and maintainer
+- [Anar K. Jafarov](https://github.com/num8er) - creator and maintainer
