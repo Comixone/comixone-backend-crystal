@@ -5,9 +5,15 @@ authors:
   - Anar K. Jafarov <anar.k.jafarov@gmail.com>
 
 targets:
-  comixone-backend:
-    main: src/comixone-backend.cr
+  comixone-api:
+    main: src/apps/api/main.cr
+  comixone-workers:
+    main: src/apps/workers/main.cr
 
 crystal: '>= 1.16.2'
 
 license: MIT
+
+dependencies:
+  kemal:
+    github: kemalcr/kemal
