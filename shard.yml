@@ -17,3 +17,7 @@ license: MIT
 dependencies:
   kemal:
     github: kemalcr/kemal
+  redis:
+    github: stefanwille/crystal-redis
+  json_mapping:
+    github: crystal-lang/json_mapping.cr

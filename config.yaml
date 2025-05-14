@@ -1,0 +1,92 @@
+# Comixone Backend Configuration Example
+# Copy this file to config.yaml and modify as needed
+
+# Server configuration
+server:
+  host: 0.0.0.0
+  port: 3000
+  environment: development # development, production, test
+
+# CouchDB configuration
+couchdb:
+  url: http://localhost:5984
+  username: comixone
+  password: comixone
+  database: comixone
+  connect_timeout: 30 # seconds
+  request_timeout: 30 # seconds
+  retry_count: 3     # number of retries for failed requests
+  retry_wait: 1      # seconds to wait between retries
+  create_if_missing: true # create database if not exists
+  auto_update_design_docs: true # update design docs if changed
+
+# Dragonfly configuration (Redis-compatible)
+dragonfly:
+  url: redis://localhost:6379
+  password: null # Set to null for no password
+  database: 0
+  connect_timeout: 5.0 # seconds
+  read_timeout: 5.0    # seconds
+  write_timeout: 5.0   # seconds
+  max_retries: 3       # number of retries for failed commands
+  retry_interval: 0.1  # seconds to wait between retries
+
+# API specific configuration
+api:
+  cors:
+    allowed_origins: "*"
+    allowed_methods: "GET, POST, PUT, DELETE, OPTIONS"
+    allowed_headers: "Content-Type, Authorization"
+    expose_headers: "Content-Length, Content-Type"
+    allow_credentials: false
+    max_age: 7200 # seconds
+  
+  # Authentication
+  auth:
+    # Basic auth for admin operations
+    basic:
+      enabled: true
+      users:
+        admin: admin123
+    
+    # JWT authentication
+    jwt:
+      enabled: false
+      secret: "change-me-in-production"
+      algorithm: "HS256"
+      expiration: 86400 # 24 hours in seconds
+  
+  # Rate limiting
+  rate_limit: false
+  rate_limit_requests: 100 # requests per minute
+  request_timeout: 30      # seconds
+  enable_compression: true
+
+# Workers specific configuration
+workers:
+  # Worker pool
+  worker_threads: 4     # number of worker threads
+  max_queue_size: 1000  # maximum size of job queue
+  
+  # Job configuration
+  jobs:
+    cleanup:
+      enabled: true
+      interval: 3600 # seconds
+      retries: 3     # number of retries for failed jobs
+      retry_wait: 60 # seconds to wait between retries
+      timeout: 300   # seconds before job is considered timed out
+    
+    notifications:
+      enabled: true
+      interval: 60   # seconds
+      retries: 3     # number of retries for failed jobs
+      retry_wait: 30 # seconds to wait between retries
+      timeout: 120   # seconds before job is considered timed out
+
+# Logging configuration
+logging:
+  level: info    # debug, info, warn, error, fatal
+  format: text   # text or json
+  output: stdout # stdout, stderr, or a file path
+  log_requests: true # log all HTTP requests
