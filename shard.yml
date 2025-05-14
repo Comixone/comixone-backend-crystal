@@ -1,0 +1,13 @@
+name: comixone-backend
+version: 0.1.0
+
+authors:
+  - Anar K. Jafarov <anar.k.jafarov@gmail.com>
+
+targets:
+  comixone-backend:
+    main: src/comixone-backend.cr
+
+crystal: '>= 1.16.2'
+
+license: MIT
