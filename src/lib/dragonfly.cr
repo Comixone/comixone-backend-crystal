@@ -37,9 +37,6 @@ module Comixone::Lib
           port: uri.port || 6379,
           password: @password,
           database: @database,
-          connect_timeout: @config.connect_timeout,
-          read_timeout: @config.read_timeout,
-          write_timeout: @config.write_timeout
         )
 
         # Test connection

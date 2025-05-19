@@ -41,7 +41,7 @@ module Comixone::Api
       add_database_auth_handler
 
       # Add JWT authentication if enabled
-      add_jwt_auth_handler if @config.api.auth.jwt.enabled
+      # add_jwt_auth_handler if @config.api.auth.jwt.enabled
 
       # Set up content type for API routes
       before_all "/api/*" do |env|
@@ -66,48 +66,29 @@ module Comixone::Api
       # Configure the logging based on config
       backend = case @config.logging.output.downcase
                 when "stdout"
-                  Log::IOBackend.new(STDOUT)
+                  ::Log::IOBackend.new(STDOUT)
                 when "stderr"
-                  Log::IOBackend.new(STDERR)
+                  ::Log::IOBackend.new(STDERR)
                 else
                   # File output
                   file = File.open(@config.logging.output, "a+")
-                  Log::IOBackend.new(file)
+                  ::Log::IOBackend.new(file)
                 end
 
-      # Set the format
-      if @config.logging.format.downcase == "json"
-        backend.formatter = Log::JsonFormatter.new
-      else
-        backend.formatter = Log::Formatter.new do |entry, io|
-          io << entry.timestamp.to_s("%Y-%m-%d %H:%M:%S") << " [" << entry.severity << "] "
-          io << entry.context.to_s << ": " if entry.context
-          io << entry.message
-          if entry.data
-            io << " -- " << entry.data
-          end
+      backend.formatter = ::Log::Formatter.new do |entry, io|
+        io << entry.timestamp.to_s("%Y-%m-%d %H:%M:%S") << " [" << entry.severity << "] "
+        io << entry.context.to_s << ": " if entry.context
+        io << entry.message
+        if entry.data
+          io << " -- " << entry.data
         end
       end
 
-      Log.setup(@config.log_level, backend)
+      ::Log.setup(@config.log_level, backend)
     end
 
     private def configure_kemal
-      # Set server options
       Kemal.config.env = @config.server.environment
-
-      # Set request timeouts
-      if @config.production?
-        Kemal.config.server_handler = HTTP::Server::RequestProcessor.new do |context|
-          # Set timeout for request processing
-          context.response.headers["X-Request-Timeout"] = @config.api.request_timeout.to_s
-
-          # Set up compression if enabled
-          if @config.api.enable_compression
-            context.response.headers["Content-Encoding"] = "gzip"
-          end
-        end
-      end
     end
 
     private def add_cors_handler
@@ -117,7 +98,7 @@ module Comixone::Api
 
     private def add_database_auth_handler
       Log.debug { "Adding Database Auth handler" }
-      add_handler DatabaseAuth.new(self)
+      add_handler Comixone::Api::Middlewares::DatabaseAuth.new(self)
     end
 
     private def add_jwt_auth_handler
@@ -129,16 +110,16 @@ module Comixone::Api
       Log.debug { "Adding request logging middleware" }
 
       before_all do |env|
-        # Record start time
-        env.set "start_time", Time.monotonic
+        # Record start time as Float64 seconds
+        env.set "start_time", Time.monotonic.total_seconds
       end
 
       after_all do |env|
         # Skip internal Kemal routes
         unless env.request.path.starts_with?("/__kemal")
           # Calculate request duration
-          start_time = env.get("start_time").as(Time::Span)
-          duration_ms = (Time.monotonic - start_time).total_milliseconds
+          start_time = env.get("start_time").as(Float64)
+          duration_ms = (Time.monotonic.total_seconds - start_time) * 1000
 
           # Get authenticated user if available
           user_info = if user = env.get?("current_user").try(&.as(Comixone::Models::User))

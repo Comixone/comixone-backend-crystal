@@ -51,14 +51,14 @@ module Comixone::Api::Handlers
           values.each do |value|
             # Skip sensitive headers in logs
             unless ["Authorization", "Cookie", "Set-Cookie"].includes?(key)
-              headers << {key: key, value: value}
+              headers << {"key" => key, "value" => value}
             end
           end
         end
 
         query_params = [] of Hash(String, String)
         request.query_params.each do |key, value|
-          query_params << {key: key, value: value}
+          query_params << {"key" => key, "value" => value}
         end
 
         body_content = request.body.try &.gets_to_end
@@ -70,13 +70,23 @@ module Comixone::Api::Handlers
             parsed = JSON.parse(body_content)
 
             # Redact any sensitive fields
-            if parsed.as_h?
+            if parsed_hash = parsed.as_h?
               sensitive_fields = ["password", "token", "secret", "key", "apiKey", "api_key"]
-              sensitive_fields.each do |field|
-                if parsed.as_h.has_key?(field)
-                  parsed[field] = "REDACTED"
+
+              # Create a new hash to store the modified values
+              redacted_hash = Hash(String, JSON::Any).new
+
+              # Copy all values, redacting sensitive ones
+              parsed_hash.each do |key, value|
+                if sensitive_fields.includes?(key)
+                  redacted_hash[key] = JSON::Any.new("REDACTED")
+                else
+                  redacted_hash[key] = value
                 end
               end
+
+              # Replace parsed with the redacted version
+              parsed = JSON::Any.new(redacted_hash)
             end
 
             body_display = parsed
@@ -95,7 +105,11 @@ module Comixone::Api::Handlers
               url:     {
                 proto: request.headers["X-Forwarded-Proto"]? || "http",
                 host:  request.headers["Host"]?,
-                port:  env.request.port,
+                port:  request.headers["Host"]?.try {
+                 |host| host.includes?(":")
+                 ? host.split(":")[1].to_i
+                 : (request.headers["X-Forwarded-Proto"]? == "https" ? 443 : 80)
+                },
                 uri:   request.path,
               },
               query: query_params,
