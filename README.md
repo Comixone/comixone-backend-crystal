@@ -186,4 +186,4 @@ This project consists of two main applications:
 1. [Crystal language stack](https://crystal-lang.org/) (v1.16.2+)
 2. [Kemal web framework](https://kemalcr.com/) for the API
 3. [CouchDB database](https://couchdb.apache.org/) as the main database
-4. [Dragonfly database](https://dragonflydb.io
+4. [Dragonfly database](https://dragonflydb.io) as active database for read operations (sync from main)
